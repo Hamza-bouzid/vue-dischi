@@ -1,7 +1,13 @@
 <template>
   <div class="container">
-    <div v-if="!loading" class="dischi">
-      <Disco v-for="(elemento, indice) in arrayDischi" :key="indice" :disco="elemento" />
+    <Select @filtra="filtraDischi" />
+    <div v-if="!loading">
+      <div class="dischi" v-if="options != 'all'">
+        <Disco v-for="(elemento, indice) in dischiFiltrati" :key="indice" :disco="elemento" />
+      </div>
+      <div class="dischi" v-else>
+        <Disco v-for="(elemento, indice) in arrayDischi" :key="indice" :disco="elemento" />
+      </div>
     </div>
     <Loader v-else />
   </div>
@@ -11,15 +17,34 @@
 import axios from "axios";
 import Disco from "../Commons/Disco.vue";
 import Loader from "../Commons/Loader.vue";
+import Select from "../Commons/Select.vue";
 
 export default {
   name: "Dischi",
+
+  components: {
+    Disco,
+    Loader,
+    Select,
+  },
+
   data() {
     return {
       apiURL: "https://flynn.boolean.careers/exercises/api/array/music",
       arrayDischi: [],
       loading: true,
+      options: "",
     };
+  },
+
+  computed: {
+    dischiFiltrati() {
+      return this.arrayDischi.filter((elemento) => {
+        if (elemento.genre.toLowerCase() === this.options) {
+          return elemento.genre;
+        }
+      });
+    },
   },
 
   created() {
@@ -34,6 +59,7 @@ export default {
           .then((risposta) => {
             // handle success
             this.arrayDischi = risposta.data.response;
+            this.dischiFiltrati = risposta.data.response;
             this.loading = false;
           })
           .catch(function (error) {
@@ -42,10 +68,10 @@ export default {
           });
       }, 1000);
     },
-  },
-  components: {
-    Disco,
-    Loader,
+
+    filtraDischi: function (input) {
+      this.options = input;
+    },
   },
 };
 </script>
