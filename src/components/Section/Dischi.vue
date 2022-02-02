@@ -2,11 +2,8 @@
   <div class="container">
     <Select @filtra="filtraDischi" />
     <div v-if="!loading">
-      <div class="dischi" v-if="options != 'all'">
+      <div class="dischi">
         <Disco v-for="(elemento, indice) in dischiFiltrati" :key="indice" :disco="elemento" />
-      </div>
-      <div class="dischi" v-else>
-        <Disco v-for="(elemento, indice) in arrayDischi" :key="indice" :disco="elemento" />
       </div>
     </div>
     <Loader v-else />
@@ -41,6 +38,8 @@ export default {
     dischiFiltrati() {
       return this.arrayDischi.filter((elemento) => {
         if (elemento.genre.toLowerCase() === this.options) {
+          return elemento.genre;
+        } else if (this.options == "all") {
           return elemento.genre;
         }
       });
